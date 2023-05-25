@@ -32,6 +32,7 @@ sel.register(lsock, selectors.EVENT_READ, data=None)
 try:
     while True:
         events = sel.select(timeout=None)
+        print("events")
         for key, mask in events:
             if key.data is None:
                 accept_wrapper(key.fileobj)

@@ -48,6 +48,7 @@ start_connection(host, port, request)
 try:
     while True:
         events = sel.select(timeout=1)
+        print("events")
         for key, mask in events:
             message = key.data
             try:

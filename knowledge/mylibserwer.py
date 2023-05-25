@@ -3,10 +3,11 @@ import selectors
 import json
 import io
 import struct
+import time
 
 request_search = {
     "morpheus": "Follow the white rabbit. \U0001f430",
-    "ring": "In the caves beneath the Misty Mountains. \U0001f48d",
+    "ring": "In the caves beneath the Misty Mountains.",
     "\U0001f436": "\U0001f43e Playing ball! \U0001f3d0",
 }
 
@@ -36,8 +37,10 @@ class Message:
         self.selector.modify(self.sock, events, data=self)
 
     def _read(self):
+        print("self._read()")
         try:
             # Should be ready to read
+            time.sleep(2)
             data = self.sock.recv(4096)
         except BlockingIOError:
             # Resource temporarily unavailable (errno EWOULDBLOCK)
@@ -45,14 +48,17 @@ class Message:
         else:
             if data:
                 self._recv_buffer += data
+                print("self._recv_buffer: ", self._recv_buffer)
             else:
                 raise RuntimeError("Peer closed.")
 
     def _write(self):
+        print("_write()")
         if self._send_buffer:
             print(f"Sending {self._send_buffer!r} to {self.addr}")
             try:
                 # Should be ready to write
+                time.sleep(2)
                 sent = self.sock.send(self._send_buffer)
             except BlockingIOError:
                 # Resource temporarily unavailable (errno EWOULDBLOCK)
@@ -64,9 +70,11 @@ class Message:
                     self.close()
 
     def _json_encode(self, obj, encoding):
+        print("_json_encode")
         return json.dumps(obj, ensure_ascii=False).encode(encoding)
 
     def _json_decode(self, json_bytes, encoding):
+        print("_json_decode")
         tiow = io.TextIOWrapper(
             io.BytesIO(json_bytes), encoding=encoding, newline=""
         )
@@ -77,6 +85,7 @@ class Message:
     def _create_message(
         self, *, content_bytes, content_type, content_encoding
     ):
+        print("_create_message")
         jsonheader = {
             "byteorder": sys.byteorder,
             "content-type": content_type,
@@ -89,6 +98,7 @@ class Message:
         return message
 
     def _create_response_json_content(self):
+        print("_create_response_json_content")
         action = self.request.get("action")
         if action == "search":
             query = self.request.get("value")
@@ -105,6 +115,7 @@ class Message:
         return response
 
     def _create_response_binary_content(self):
+        print("_create_response_binary_content")
         response = {
             "content_bytes": b"First 10 bytes of request: "
             + self.request[:10],
@@ -159,20 +170,25 @@ class Message:
             self.sock = None
 
     def process_protoheader(self):
+        print("process_protoheader:")
         hdrlen = 2
         if len(self._recv_buffer) >= hdrlen:
             self._jsonheader_len = struct.unpack(
                 ">H", self._recv_buffer[:hdrlen]
             )[0]
             self._recv_buffer = self._recv_buffer[hdrlen:]
+            print("self._jsonheader_len: ", self._jsonheader_len)
+            print("self._recv_buffer:  ", self._recv_buffer)
 
     def process_jsonheader(self):
+        print("process_jsonheader")
         hdrlen = self._jsonheader_len
         if len(self._recv_buffer) >= hdrlen:
             self.jsonheader = self._json_decode(
                 self._recv_buffer[:hdrlen], "utf-8"
             )
             self._recv_buffer = self._recv_buffer[hdrlen:]
+            print("self.jsonheader:  ", self.jsonheader)
             for reqhdr in (
                 "byteorder",
                 "content-length",
@@ -183,11 +199,14 @@ class Message:
                     raise ValueError(f"Missing required header '{reqhdr}'.")
 
     def process_request(self):
+        print("process_request")
         content_len = self.jsonheader["content-length"]
         if not len(self._recv_buffer) >= content_len:
             return
         data = self._recv_buffer[:content_len]
+        print("data: ", data, "type: ", type(data))
         self._recv_buffer = self._recv_buffer[content_len:]
+        print("self._recv_buffer: ", self._recv_buffer)
         if self.jsonheader["content-type"] == "text/json":
             encoding = self.jsonheader["content-encoding"]
             self.request = self._json_decode(data, encoding)
@@ -203,6 +222,7 @@ class Message:
         self._set_selector_events_mask("w")
 
     def create_response(self):
+        print("create_response")
         if self.jsonheader["content-type"] == "text/json":
             response = self._create_response_json_content()
         else:
