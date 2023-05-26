@@ -20,6 +20,7 @@ stop - stop server and client"""
         self.lsock.listen()
         print(f"Listening on {(self.HOST, self.PORT)}")
         self.stop = False
+        self.answer_to_send = {"command": {"bład": "Nie rozpoznano polecenia"}}
 
     def run(self):
         conn, addr = self.lsock.accept()  # Should be ready to read
@@ -37,30 +38,41 @@ stop - stop server and client"""
                     break
 
     def options(self, data, conn):
-        answer_to_send = {"command": {"bład": "Nie rozpoznano polecenia"}}
         if data == "uptime":
-            answer = {"uptime": str(datetime.datetime.now() - self.start_time)[:7]}
-            answer_to_send["command"] = answer
-            print(answer_to_send["command"])
+            self.uptime()
         if data == "info":
-            answer = {"info:": f"Version: {'1.0.0'}, date of create server: {self.date_of_create}"}
-            answer_to_send["command"] = answer
-            print(answer_to_send["command"])
+            self.info()
         if data == "help":
-            answer = {"help": self.HELP}
-            answer_to_send["command"] = answer
-            print(answer_to_send["command"])
+            self.help()
         if data == "stop":
-            answer = {"stop": "stop"}
-            answer_to_send["command"] = answer
-            self.stop = True
-            print(answer_to_send["command"])
+            self.stop()
 
-        answer_to_send = json.dumps(answer_to_send).encode(encoding='utf8')
-        conn.sendall(answer_to_send)
+        self.answer_to_send = json.dumps(self.answer_to_send).encode(encoding='utf8')
+        conn.sendall(self.answer_to_send)
 
         if self.stop:
             self.lsock.close()
+
+    def uptime(self):
+        answer = {"uptime": str(datetime.datetime.now() - self.start_time)[:7]}
+        self.answer_to_send["command"] = answer
+        print(self.answer_to_send["command"])
+
+    def info(self):
+        answer = {"info:": f"Version: {'1.0.0'}, date of create server: {self.date_of_create}"}
+        self.answer_to_send["command"] = answer
+        print(self.answer_to_send["command"])
+
+    def help(self):
+        answer = {"help": self.HELP}
+        self.answer_to_send["command"] = answer
+        print(self.answer_to_send["command"])
+
+    def stop(self):
+        answer = {"stop": "stop"}
+        self.answer_to_send["command"] = answer
+        self.stop = True
+        print(self.answer_to_send["command"])
 
 
 if __name__ == '__main__':
