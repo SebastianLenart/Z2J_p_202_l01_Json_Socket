@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "nick": "Seba",
+      "password": "qaz123",
+      "admin": true,
+      "messages": [
+        {
+          "from": "Olaf",
+          "text_from_receiver": [
+            "Hello Seba"
+          ],
+          "text_send_to_receiver": [
+            "Hello reveiver"
+          ]
+        }
+      ]
+    },
+    {
+      "nick": "Olaf",
+      "password": "qaz321",
+      "admin": false,
+      "messages": [
+        {
+          "from": "Seba",
+          "text_from_receiver": [
+            "Hello Olaf"
+          ],
+          "text_send_to_receiver": [
+            "Hello reveiver"
+          ]
+        }
+      ]
+    }
+  ]
+}

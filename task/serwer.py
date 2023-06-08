@@ -9,7 +9,13 @@ class Serwer:
     HELP = """uptime - return timelife of server
 info - return version and date of create server
 help - return described options, just like that     
-stop - stop server and client"""
+stop - stop server and client
+login - let you login to system
+logout - let you logout from system
+register new user - you can add new user
+profil - show info about register user
+send message - you can send message to receiver
+receiver message - you can get message from receiver"""
 
     def __init__(self):
         self.start_time = datetime.datetime.now()
@@ -30,6 +36,7 @@ stop - stop server and client"""
             print(f"Connected by {addr}")
             while True:
                 data = conn.recv(1024)
+                print("data1: ", data)
                 sdata = json.loads(data.decode(encoding="utf8"))
                 if not sdata:
                     break
@@ -38,6 +45,7 @@ stop - stop server and client"""
                     break
 
     def options(self, data, conn):
+        print("data2: ", data)
         if data == "uptime":
             self.uptime()
         if data == "info":

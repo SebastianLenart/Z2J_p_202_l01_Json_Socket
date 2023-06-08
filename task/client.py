@@ -1,25 +1,40 @@
 import json
 import socket
+from user import User
 
 
 class Client:
+    USER = "None"
     HOST = "127.0.0.1"
     PORT = 65432
-    MENU = """Your options: " 
-1.) uptime - return timelife of server 
-2.) info - return version and date of create server
-3.) help - return described options, just like that            
-4.) stop - stop server and client
-Select option: """
+    MENU = f"""uptime - return timelife of server
+info - return version and date of create server
+help - return described options, just like that     
+stop - stop server and client
+login <nick> <password> - let you login to system
+logout - let you logout from system
+register new user - you can add new user
+profil - show info about register user
+send message - you can send message to receiver
+receiver message - you can get message from receiver
+You are {User}, select option: """
 
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect_ex((self.HOST, self.PORT))
+        self.json_to_send = {
+            "user": None,
+            "command": None,
+            "password": None
+        }
+        print(self.MENU)
 
     def run(self):
         while True:
-            option = input(self.MENU)
-            self.sock.send(json.dumps(option).encode(encoding='utf8'))
+            command = input(f"you are {self.json_to_send['user']}, please select option: ")
+            self.json_to_send["command"] = command
+            print(self.json_to_send)
+            self.sock.send(json.dumps(self.json_to_send).encode(encoding='utf8'))
             response = self.sock.recv(1024)
             self.response(json.loads(response.decode(encoding="utf8")))
 
@@ -32,7 +47,6 @@ Select option: """
             print(res["command"]["help"])
             return
         print(res["command"])
-
 
 
 if __name__ == '__main__':
