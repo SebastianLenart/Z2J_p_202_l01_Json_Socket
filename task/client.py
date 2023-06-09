@@ -16,16 +16,21 @@ logout - let you logout from system
 register new user - you can add new user
 profil - show info about register user
 send message - you can send message to receiver
+check all messages
+unread messages
+list of users
 receiver message - you can get message from receiver
-You are {User}, select option: """
+Select option: """
 
     def __init__(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect_ex((self.HOST, self.PORT))
         self.json_to_send = {
-            "user": None,
             "command": None,
-            "password": None
+            "user": None,
+            "password": None,
+            "message": None,
+            "is_admin": None
         }
         print(self.MENU)
 
