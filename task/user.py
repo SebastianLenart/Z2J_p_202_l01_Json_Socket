@@ -3,6 +3,7 @@ from pprint import pprint
 
 
 class User:
+    BUFFOR_MESSAGES = 5
 
     def __init__(self):
         self.nick = None
@@ -16,7 +17,9 @@ class User:
             for userr in users["users"]:
                 if userr["nick"] == nick:
                     self.set_data_from_json(**userr)
-                    break
+                    return
+            return "No have this user"
+
 
     def set_data_from_json(self, nick="default", password="default", admin="default",
                            messages="default"):
@@ -30,14 +33,17 @@ class User:
 
     def print_messages(self, nick):
         sorted_messages = self.sort_messages_by_date(nick)
-        print(sorted_messages)
+        print(f"Conversation with {nick}")
+        for from_, text, date in sorted_messages:
+            print(from_, text, date)
         only_text = list(map(lambda x: x[1], sorted_messages))
         # pprint(only_text)
 
     def sort_messages_by_date(self, from_nick="Oli"):
         for text in self.messages:
             if text["from"] == from_nick:
-                return sorted(text["text"], key=lambda x: x[2])
+                text["text"] = sorted(text["text"], key=lambda x: x[2])
+                return text["text"]
 
     def check_unread_messages(self):
         for text in self.messages:
@@ -45,13 +51,14 @@ class User:
                 continue
             print(f"You have {len(text['unread'])} unread messages from {text['from']}: ")
             self.read_unread_messages(text)  # we deliver 1 dictionary
+            self.sort_messages_by_date(text['from'])
+            text["unread"].clear()
 
     def read_unread_messages(self, messages):
         for num, text in enumerate(messages["unread"]):
             print(num + 1, text)
-            text.insert(0, "from_receiver")
+            text.insert(0, f"from_{messages['from']}")
             self.add_to_read_text(text, messages)
-        messages["unread"].clear()
 
     def add_to_read_text(self, text, messages):
         messages["text"].append(text)
@@ -68,8 +75,29 @@ class User:
 
 
 user = User()
-user.load_data_from_json("Seba")
-# user.print_nick()
+user.load_data_from_json("Sebaz")
+
 user.print_messages("Olii")
 user.check_unread_messages()
-# user.update_messages_in_json_file()
+user.print_messages("Olii")
+
+# user.update_messages_in_json_file() # dziala
+
+"""
+TODO
+
+wysyłanie wiadomosci
+cos z adminem i uprawnieniami
+usuwanie/dodawanie(rejestracja) uzytkownikow
+logowanie i wylogowywanie
+
+"""
+
+"""
+przepełnienie 5 wiadomosci zrobiłem tak, że każdy uzytkownik moze wysłać bez odczytania max 5 wiadomosci
+do odbiorcy, czyli jeżeli wysyła dwóch nadawców to maksymalnie odbiora ma do odczytu 10 wiadomosci,
+
+można bylo by zrobic że te 5 wiadomosci to sumaryczna liczba nieodczytanych wiadomosci od wszystkich nadawców,
+ale wybrałem opcje 1szą.
+
+"""

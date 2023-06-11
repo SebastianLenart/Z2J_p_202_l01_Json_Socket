@@ -7,15 +7,24 @@
       "messages": [
         {
           "from": "Olaf",
-          "unread": [],
+          "unread": [
+            [
+              "4",
+              "2023-06-11 15:56:48"
+            ],
+            [
+              "5",
+              "2023-06-11 16:56:48"
+            ]
+          ],
           "text": [
             [
-              "from_receiver",
+              "from_Olaf",
               "Hello Seba",
               "2023-06-11 12:56:48"
             ],
             [
-              "send_to_receiver",
+              "send_to_Olaf",
               "Hello reveiver",
               "2023-06-11 12:56:49"
             ]
@@ -35,24 +44,16 @@
             [
               "3",
               "2023-06-11 14:56:48"
-            ],
-            [
-              "4",
-              "2023-06-11 15:56:48"
-            ],
-            [
-              "5",
-              "2023-06-11 16:56:48"
             ]
           ],
           "text": [
             [
-              "from_receiver",
+              "from_Olii",
               "Hello Seba",
               "2023-06-11 12:56:48"
             ],
             [
-              "send_to_receiver",
+              "send_to_Olii",
               "Hello reveiver",
               "2023-06-11 12:56:49"
             ]
