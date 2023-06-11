@@ -1,7 +1,7 @@
 import json
 import datetime
 import socket
-
+from user import User
 
 class Serwer:
     HOST = "127.0.0.1"
@@ -27,7 +27,7 @@ receiver message - you can get message from receiver"""
         print(f"Listening on {(self.HOST, self.PORT)}")
         self.stop = False
         self.answer_to_send = {"command": {"bład": "Nie rozpoznano polecenia"}}
-        self.list_of_users = []
+        self.user = User()
 
     def run(self):
         conn, addr = self.lsock.accept()  # Should be ready to read
