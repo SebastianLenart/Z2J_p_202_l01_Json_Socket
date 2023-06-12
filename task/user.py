@@ -1,5 +1,6 @@
 import json
 from pprint import pprint
+from exception import SomethingWrong
 
 
 class User:
@@ -10,16 +11,22 @@ class User:
         self.password = None
         self.admin = None
         self.messages = None
+        self.users_file = None
 
     def load_data_from_json(self, nick: str):
         with open("data.json", "r") as file:
-            users = json.load(file)
-            for userr in users["users"]:
+            self.users_file = json.load(file)
+            self.check_user_exists(self.users_file["users"], nick)
+            for userr in self.users_file["users"]:
                 if userr["nick"] == nick:
                     self.set_data_from_json(**userr)
                     return
-            return "No have this user"
 
+    def check_user_exists(self, list_users, nick):
+        for user_dict in list_users:
+            if user_dict["nick"] == nick:
+                return True
+        raise SomethingWrong(f"Not found user {nick}")
 
     def set_data_from_json(self, nick="default", password="default", admin="default",
                            messages="default"):
@@ -31,7 +38,7 @@ class User:
     def print_nick(self):
         print(self.nick, self.password, self.admin)
 
-    def print_messages(self, nick):
+    def show_conversation(self, nick):
         sorted_messages = self.sort_messages_by_date(nick)
         print(f"Conversation with {nick}")
         for from_, text, date in sorted_messages:
@@ -64,22 +71,29 @@ class User:
         messages["text"].append(text)
 
     def update_messages_in_json_file(self):
-        with open("data.json", "r") as read:
-            users = json.load(read)
-            for user in users["users"]:
-                if user["nick"] == self.nick:
-                    user["messages"] = self.messages
-                    break
-            with open("data.json", "w") as write:
-                json.dump(users, write, indent=4)
+        for user in self.users_file["users"]:
+            if user["nick"] == self.nick:
+                user["messages"] = self.messages
+                break
+        with open("data.json", "w") as write:
+            json.dump(self.users_file, write, indent=4)
+
+    def send_text_to(self, send_to_nick, text: list):
+        text.insert(0, f"send_to_{send_to_nick}")
+        self.check_user_exists(self.users_file["users"], send_to_nick) # niemożemy wyslac do osoby ktora nie istnieje
+        self.check_do_u_have_this_nick_in_conwersation(send_to_nick)
+
+    def check_do_u_have_this_nick_in_conwersation(self, nick):
+        pass
 
 
 user = User()
-user.load_data_from_json("Sebaz")
+user.load_data_from_json("Seba")
 
-user.print_messages("Olii")
+user.show_conversation("Olii")
 user.check_unread_messages()
-user.print_messages("Olii")
+user.show_conversation("Olii")
+user.send_text_to("Olaf", ["wiadomosc", "12"])
 
 # user.update_messages_in_json_file() # dziala
 
@@ -99,5 +113,9 @@ do odbiorcy, czyli jeżeli wysyła dwóch nadawców to maksymalnie odbiora ma do
 
 można bylo by zrobic że te 5 wiadomosci to sumaryczna liczba nieodczytanych wiadomosci od wszystkich nadawców,
 ale wybrałem opcje 1szą.
+
+
+teorytycznie nadawca i odbiorca powinni miec identyczna historie konwersacji miedzy sobą..
+Dopóki nie zmodyfikuje jsona to algorytm powiniem tak zadzialac
 
 """
