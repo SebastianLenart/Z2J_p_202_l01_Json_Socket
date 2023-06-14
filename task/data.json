@@ -6,7 +6,7 @@
       "admin": true,
       "messages": [
         {
-          "from": "Olaf",
+          "with": "Olaf",
           "unread": [
             [
               "4",
@@ -31,7 +31,7 @@
           ]
         },
         {
-          "from": "Olii",
+          "with": "Olii",
           "unread": [
             [
               "1",
@@ -67,7 +67,7 @@
       "admin": false,
       "messages": [
         {
-          "from": "Seba",
+          "with": "Seba",
           "unread": [],
           "text": [
             [

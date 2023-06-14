@@ -48,7 +48,7 @@ class User:
 
     def sort_messages_by_date(self, from_nick="Oli"):
         for text in self.messages:
-            if text["from"] == from_nick:
+            if text["with"] == from_nick:
                 text["text"] = sorted(text["text"], key=lambda x: x[2])
                 return text["text"]
 
@@ -56,15 +56,15 @@ class User:
         for text in self.messages:
             if len(text['unread']) == 0:
                 continue
-            print(f"You have {len(text['unread'])} unread messages from {text['from']}: ")
+            print(f"You have {len(text['unread'])} unread messages from {text['with']}: ")
             self.read_unread_messages(text)  # we deliver 1 dictionary
-            self.sort_messages_by_date(text['from'])
+            self.sort_messages_by_date(text['with'])
             text["unread"].clear()
 
     def read_unread_messages(self, messages):
         for num, text in enumerate(messages["unread"]):
             print(num + 1, text)
-            text.insert(0, f"from_{messages['from']}")
+            text.insert(0, f"from_{messages['with']}")
             self.add_to_read_text(text, messages)
 
     def add_to_read_text(self, text, messages):
@@ -80,17 +80,24 @@ class User:
 
     def send_text_to(self, send_to_nick, text: list):
         text.insert(0, f"send_to_{send_to_nick}")
-        self.check_user_exists(self.users_file["users"], send_to_nick) # niemożemy wyslac do osoby ktora nie istnieje
+        self.check_user_exists(self.users_file["users"], send_to_nick)  # niemożemy wyslac do osoby ktora nie istnieje
         self.check_do_u_have_this_nick_in_conwersation(send_to_nick)
 
+
     def check_do_u_have_this_nick_in_conwersation(self, nick):
-        pass
+        for mess_disct in self.messages:
+            if mess_disct["with"] == nick:
+                return
+        self.messages.append({
+            "with": nick,
+            "unread": [],
+            "text": []
+        })
 
 
 user = User()
 user.load_data_from_json("Seba")
-
-user.show_conversation("Olii")
+# user.show_conversation("Olii")
 user.check_unread_messages()
 user.show_conversation("Olii")
 user.send_text_to("Olaf", ["wiadomosc", "12"])
