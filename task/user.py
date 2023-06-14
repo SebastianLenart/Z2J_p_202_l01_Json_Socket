@@ -81,9 +81,9 @@ class User:
     def send_text_to(self, send_to_nick, text: list):
         text.insert(0, f"send_to_{send_to_nick}")
         self.check_user_exists(self.users_file["users"], send_to_nick) # niemożemy wyslac do osoby ktora nie istnieje
-        self.check_do_u_have_this_nick_in_conwersation(send_to_nick)
+        self.check_do_u_have_this_nick_in_conversation(send_to_nick)
 
-    def check_do_u_have_this_nick_in_conwersation(self, nick):
+    def check_do_u_have_this_nick_in_conversation(self, nick):
         pass
 
 
