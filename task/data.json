@@ -1,88 +1,92 @@
 {
-  "users": [
-    {
-      "nick": "Seba",
-      "password": "qaz123",
-      "admin": true,
-      "messages": [
+    "users": [
         {
-          "with": "Olaf",
-          "unread": [
-            [
-              "4",
-              "2023-06-11 15:56:48"
-            ],
-            [
-              "5",
-              "2023-06-11 16:56:48"
+            "nick": "Seba",
+            "password": "qaz123",
+            "admin": true,
+            "messages": [
+                {
+                    "with": "Olii",
+                    "unread": [],
+                    "text": [
+                        [
+                            "from_receiver",
+                            "Hello Seba",
+                            "2023-06-11 12:56:48"
+                        ],
+                        [
+                            "send_to_receiver",
+                            "Hello reveiver",
+                            "2023-06-11 12:56:49"
+                        ],
+                        [
+                            "from_Olii",
+                            "1",
+                            "2023-06-11 12:59:48"
+                        ],
+                        [
+                            "from_Olii",
+                            "2",
+                            "2023-06-11 13:56:48"
+                        ],
+                        [
+                            "from_Olii",
+                            "3",
+                            "2023-06-11 14:56:48"
+                        ],
+                        [
+                            "from_Olii",
+                            "4",
+                            "2023-06-11 15:56:48"
+                        ],
+                        [
+                            "from_Olii",
+                            "5",
+                            "2023-06-11 16:56:48"
+                        ]
+                    ]
+                },
+                {
+                    "with": "Olaf",
+                    "unread": [],
+                    "text": [
+                        [
+                            "from_Seba",
+                            "wiadomosc",
+                            "12"
+                        ]
+                    ]
+                }
             ]
-          ],
-          "text": [
-            [
-              "from_Olaf",
-              "Hello Seba",
-              "2023-06-11 12:56:48"
-            ],
-            [
-              "send_to_Olaf",
-              "Hello reveiver",
-              "2023-06-11 12:56:49"
-            ]
-          ]
         },
         {
-          "with": "Olii",
-          "unread": [
-            [
-              "1",
-              "2023-06-11 12:59:48"
-            ],
-            [
-              "2",
-              "2023-06-11 13:56:48"
-            ],
-            [
-              "3",
-              "2023-06-11 14:56:48"
+            "nick": "Olaf",
+            "password": "qaz321",
+            "admin": false,
+            "messages": [
+                {
+                    "with": "Seba",
+                    "unread": [
+                        [
+                            "from_Seba",
+                            "wiadomosc",
+                            "12"
+                        ]
+                    ],
+                    "text": [
+                        [
+                            "from_receiver",
+                            "Hello Olaf",
+                            "2023-06-11 12:57:48"
+                        ],
+                        [
+                            "send_to_receiver",
+                            "Hello reveiver",
+                            "2023-06-11 12:58:49"
+                        ]
+                    ]
+                }
             ]
-          ],
-          "text": [
-            [
-              "from_Olii",
-              "Hello Seba",
-              "2023-06-11 12:56:48"
-            ],
-            [
-              "send_to_Olii",
-              "Hello reveiver",
-              "2023-06-11 12:56:49"
-            ]
-          ]
         }
-      ]
-    },
-    {
-      "nick": "Olaf",
-      "password": "qaz321",
-      "admin": false,
-      "messages": [
-        {
-          "with": "Seba",
-          "unread": [],
-          "text": [
-            [
-              "from_Seba",
-              "Hello Olaf",
-              "2023-06-11 12:57:48"
-            ],
-            [
-              "send_to_Seba",
-              "Hello reveiver",
-              "2023-06-11 12:58:49"
-            ]
-          ]
-        }
-      ]
-    }
-  ]
+    ]
 }

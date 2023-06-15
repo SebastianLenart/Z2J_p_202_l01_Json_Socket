@@ -76,23 +76,34 @@ class User:
                 user["messages"] = self.messages
                 break
         with open("data.json", "w") as write:
-            json.dump(self.users_file, write, indent=4)
+            json.dump(self.users_file, write, indent=4) # dziwne, inne usery tez sie zapisuja, ale to dobrze!
 
     def send_text_to(self, send_to_nick, text: list):
         text.insert(0, f"send_to_{send_to_nick}")
         self.check_user_exists(self.users_file["users"], send_to_nick)  # niemożemy wyslac do osoby ktora nie istnieje
-        self.check_do_u_have_this_nick_in_conwersation(send_to_nick)
+        conversation_person = self.check_do_u_have_this_nick_in_conversation(send_to_nick, self.messages)
+        # save data in my profil and his/her profil as well
+        conversation_person["text"].append(text)
+        text[0] = f"from_{self.nick}"
+        self.save_unread_text_in_receiver(send_to_nick, text)
+        # self.update_data_in_json()
 
-
-    def check_do_u_have_this_nick_in_conwersation(self, nick):
-        for mess_disct in self.messages:
+    def check_do_u_have_this_nick_in_conversation(self, nick, messages):
+        for mess_disct in messages:
             if mess_disct["with"] == nick:
-                return
+                return mess_disct
         self.messages.append({
             "with": nick,
             "unread": [],
             "text": []
         })
+        return self.messages[-1]
+
+    def save_unread_text_in_receiver(self, nick, text: list):
+        for user_dict in self.users_file["users"]:
+            if user_dict["nick"] == nick:
+                conversation_person = self.check_do_u_have_this_nick_in_conversation(self.nick, user_dict["messages"])
+                conversation_person["unread"].append(text)
 
 
 user = User()
@@ -102,7 +113,7 @@ user.check_unread_messages()
 user.show_conversation("Olii")
 user.send_text_to("Olaf", ["wiadomosc", "12"])
 
-# user.update_messages_in_json_file() # dziala
+user.update_messages_in_json_file()  # dziala
 
 """
 TODO
