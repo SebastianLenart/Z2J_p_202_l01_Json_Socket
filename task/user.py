@@ -4,7 +4,7 @@ from exception import SomethingWrong
 
 
 class User:
-    BUFFOR_MESSAGES = 5
+    BUFOR_MESSAGES = 5
 
     def __init__(self):
         self.nick = None
@@ -13,12 +13,41 @@ class User:
         self.messages = None
         self.users_file = None
 
-    def load_data_from_json(self, nick: str):
+    # add to new user can only admin
+    def register_new_user(self, nick="Default", password="1234", admin=False):
+        if not self.admin:
+            print(f"Only admin can add new user!")
+            return f"Only admin can add new user!"
+        for user in self.users_file["users"]:
+            if user["nick"] == nick:
+                print("This nick is busy.")
+                return f"This nick is busy."
+        new_user = {
+            "nick": nick,
+            "password": password,
+            "admin": admin,
+            "messages": []
+        }
+        self.users_file["users"].append(new_user)
+        with open("data.json", "w") as write:
+            json.dump(self.users_file, write, indent=4)  # dziwne, inne usery tez sie zapisuja, ale to dobrze!
+
+    def show_list_users(self):
+        return self.users_file["users"]
+
+    def show_base_info_about(self, nick):
+        if not self.admin:
+            print(f"Only admin can get info!")
+        for user in self.users_file["users"]:
+            if user["nick"] == nick:
+                return [user["nick"], user["password"], user["admin"]]
+
+    def login(self, nick: str, password):
         with open("data.json", "r") as file:
             self.users_file = json.load(file)
             self.check_user_exists(self.users_file["users"], nick)
             for userr in self.users_file["users"]:
-                if userr["nick"] == nick:
+                if userr["nick"] == nick and userr["password"] == password:
                     self.set_data_from_json(**userr)
                     return
 
@@ -76,11 +105,23 @@ class User:
                 user["messages"] = self.messages
                 break
         with open("data.json", "w") as write:
-            json.dump(self.users_file, write, indent=4) # dziwne, inne usery tez sie zapisuja, ale to dobrze!
+            json.dump(self.users_file, write, indent=4)  # dziwne, inne usery tez sie zapisuja, ale to dobrze!
+
+    def check_bufor_in_receiver(self, nick):
+        for user_dict in self.users_file["users"]:
+            if user_dict["nick"] == nick:
+                for conversation in user_dict["messages"]:
+                    if conversation["with"] == self.nick:
+                        if len(conversation["unread"]) >= self.BUFOR_MESSAGES:
+                            return True
+        return False
 
     def send_text_to(self, send_to_nick, text: list):
-        text.insert(0, f"send_to_{send_to_nick}")
         self.check_user_exists(self.users_file["users"], send_to_nick)  # niemożemy wyslac do osoby ktora nie istnieje
+        if self.check_bufor_in_receiver(send_to_nick):
+            print(f"Bufor is full, you cant sent texts")
+            return f"Bufor is full, you cant sent textt"
+        text.insert(0, f"send_to_{send_to_nick}")
         conversation_person = self.check_do_u_have_this_nick_in_conversation(send_to_nick, self.messages)
         # save data in my profil and his/her profil as well
         conversation_person["text"].append(text)
@@ -106,28 +147,26 @@ class User:
                 conversation_person["unread"].append(text)
 
 
-user = User()
-user.load_data_from_json("Seba")
-# user.show_conversation("Olii")
-user.check_unread_messages()
-user.show_conversation("Olii")
-user.send_text_to("Olaf", ["wiadomosc", "12"])
-
-user.update_messages_in_json_file()  # dziala
+if __name__ == '__main__': # !!! bez tego ponizsze linijki beda wywolywane gdy gdzies uzyjemy 'from user import User'
+    user = User()
+    user.login("Seba", "qaz123")
+    # user.show_conversation("Olii")
+    user.check_unread_messages()
+    # user.show_conversation("Olii")
+    user.send_text_to("Olaf", ["wiadomosc", "16"])
+    # user.register_new_user()
+    user.update_messages_in_json_file()  # dziala
 
 """
 TODO
-
-wysyłanie wiadomosci
-cos z adminem i uprawnieniami
-usuwanie/dodawanie(rejestracja) uzytkownikow
+usuwanie/dodawanie(rejestracja) uzytkownikow # potem usuwanie dokonczyc
 logowanie i wylogowywanie
-
+przenies potem dane do postgresqla
 """
 
 """
 przepełnienie 5 wiadomosci zrobiłem tak, że każdy uzytkownik moze wysłać bez odczytania max 5 wiadomosci
-do odbiorcy, czyli jeżeli wysyła dwóch nadawców to maksymalnie odbiora ma do odczytu 10 wiadomosci,
+do odbiorcy, czyli jeżeli wysyła dwóch nadawców to maksymalnie odbiorca ma do odczytu 10 wiadomosci,
 
 można bylo by zrobic że te 5 wiadomosci to sumaryczna liczba nieodczytanych wiadomosci od wszystkich nadawców,
 ale wybrałem opcje 1szą.

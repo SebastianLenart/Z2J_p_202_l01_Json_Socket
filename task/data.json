@@ -10,12 +10,12 @@
                     "unread": [],
                     "text": [
                         [
-                            "from_receiver",
+                            "from_Olii",
                             "Hello Seba",
                             "2023-06-11 12:56:48"
                         ],
                         [
-                            "send_to_receiver",
+                            "send_to_Olii",
                             "Hello reveiver",
                             "2023-06-11 12:56:49"
                         ],
@@ -53,7 +53,17 @@
                         [
                             "from_Seba",
                             "wiadomosc",
-                            "12"
+                            "13"
+                        ],
+                        [
+                            "from_Seba",
+                            "wiadomosc",
+                            "14"
+                        ],
+                        [
+                            "from_Seba",
+                            "wiadomosc",
+                            "15"
                         ]
                     ]
                 }
@@ -71,6 +81,26 @@
                             "from_Seba",
                             "wiadomosc",
                             "12"
+                        ],
+                        [
+                            "from_Seba",
+                            "wiadomosc",
+                            "13"
+                        ],
+                        [
+                            "from_Seba",
+                            "wiadomosc",
+                            "13"
+                        ],
+                        [
+                            "from_Seba",
+                            "wiadomosc",
+                            "14"
+                        ],
+                        [
+                            "from_Seba",
+                            "wiadomosc",
+                            "15"
                         ]
                     ],
                     "text": [

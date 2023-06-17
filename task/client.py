@@ -37,7 +37,9 @@ Select option: """
     def run(self):
         while True:
             command = input(f"you are {self.json_to_send['user']}, please select option: ")
-            self.json_to_send["command"] = command
+            li = command.split(" ")
+            print(li)
+            self.json_to_send["command"] = command.split(" ")
             print(self.json_to_send)
             self.sock.send(json.dumps(self.json_to_send).encode(encoding='utf8'))
             response = self.sock.recv(1024)
@@ -55,5 +57,5 @@ Select option: """
 
 
 if __name__ == '__main__':
-    server = Client()
-    server.run()
+    client = Client()
+    client.run()

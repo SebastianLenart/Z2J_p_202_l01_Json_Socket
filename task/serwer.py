@@ -47,13 +47,13 @@ receiver message - you can get message from receiver"""
 
     def options(self, data, conn):
         print("data2: ", data)
-        if data == "uptime":
+        if data["command"] == "uptime":
             self.uptime()
-        if data == "info":
+        if data["command"] == "info":
             self.info()
-        if data == "help":
+        if data["command"] == "help":
             self.help()
-        if data == "stop":
+        if data["command"] == "stop":
             self.stop()
 
         self.answer_to_send = json.dumps(self.answer_to_send).encode(encoding='utf8')
