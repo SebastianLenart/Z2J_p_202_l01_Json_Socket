@@ -20,7 +20,6 @@ class User:
             return f"Only admin can add new user!"
         for user in self.users_file["users"]:
             if user["nick"] == nick:
-                print("This nick is busy.")
                 return f"This nick is busy."
         new_user = {
             "nick": nick,
@@ -31,16 +30,17 @@ class User:
         self.users_file["users"].append(new_user)
         with open("data.json", "w") as write:
             json.dump(self.users_file, write, indent=4)  # dziwne, inne usery tez sie zapisuja, ale to dobrze!
+            return f"Register done!"
 
     def show_list_users(self):
         return self.users_file["users"]
 
     def show_base_info_about(self, nick):
-        if self.admin == "admin":
-            print(f"Only admin can get info!")
+        if self.admin != "admin":
+            return f"Only admin can get info!"
         for user in self.users_file["users"]:
             if user["nick"] == nick:
-                return [user["nick"], user["password"], user["admin"]]
+                return f"{user['nick']}, {user['password']}, {user['admin']}"
 
     def login(self, nick: str = "default", password: str = "1234"):
         with open("data.json", "r") as file:
@@ -50,9 +50,10 @@ class User:
             for userr in self.users_file["users"]:
                 if userr["nick"] == nick and userr["password"] == password:
                     self.set_data_from_json(**userr)
-                    return f"OK"
+                    return f"Login"
                 else:
-                    return f"Password is wrong"
+                    continue
+            return f"Password is wrong"
 
     def check_user_exists(self, list_users, nick):
         for user_dict in list_users:
@@ -72,12 +73,18 @@ class User:
         print(self.nick, self.password, self.admin)
 
     def show_conversation(self, nick):
+        self.check_do_u_have_this_nick_in_conversation(nick, self.messages)
+        self.check_unread_messages() # odczytuje nieodczytane, ale wszystkie, nie tylko od tego konkretnego usera...
         sorted_messages = self.sort_messages_by_date(nick)
         print(f"Conversation with {nick}")
+        return_list = []
         for from_, text, date in sorted_messages:
-            print(from_, text, date)
+            return_list.append([from_, text, date])
+        if not return_list:
+            print("- Empty")
         only_text = list(map(lambda x: x[1], sorted_messages))
         # pprint(only_text)
+        return return_list
 
     def sort_messages_by_date(self, from_nick="Oli"):
         for text in self.messages:
@@ -86,19 +93,24 @@ class User:
                 return text["text"]
 
     def check_unread_messages(self):
+        return_unread_texts = []
         for text in self.messages:
             if len(text['unread']) == 0:
                 continue
             print(f"You have {len(text['unread'])} unread messages from {text['with']}: ")
-            self.read_unread_messages(text)  # we deliver 1 dictionary
+            return_unread_texts = self.read_unread_messages(text)  # we deliver 1 dictionary
             self.sort_messages_by_date(text['with'])
             text["unread"].clear()
+        self.update_messages_in_json_file()
+        return return_unread_texts
 
     def read_unread_messages(self, messages):
+        return_list = []
         for num, text in enumerate(messages["unread"]):
             print(num + 1, text)
-            text.insert(0, f"from_{messages['with']}")
+            return_list.append(text)
             self.add_to_read_text(text, messages)
+        return return_list
 
     def add_to_read_text(self, text, messages):
         messages["text"].append(text)
@@ -121,17 +133,19 @@ class User:
         return False
 
     def send_text_to(self, send_to_nick, text: list):
-        self.check_user_exists(self.users_file["users"], send_to_nick)  # niemożemy wyslac do osoby ktora nie istnieje
+        if not self.check_user_exists(self.users_file["users"], send_to_nick):
+            return f"Not found user {send_to_nick}" # niemożemy wyslac do osoby ktora nie istnieje
         if self.check_bufor_in_receiver(send_to_nick):
-            print(f"Bufor is full, you cant sent texts")
-            return f"Bufor is full, you cant sent textt"
+            return f"Bufor is full, you cant sent text"
         text.insert(0, f"send_to_{send_to_nick}")
         conversation_person = self.check_do_u_have_this_nick_in_conversation(send_to_nick, self.messages)
         # save data in my profil and his/her profil as well
         conversation_person["text"].append(text)
-        text[0] = f"from_{self.nick}"
-        self.save_unread_text_in_receiver(send_to_nick, text)
-        # self.update_data_in_json()
+        text2 = text[:]
+        text2[0] = f"from_{self.nick}"
+        self.save_unread_text_in_receiver(send_to_nick, text2)
+        self.update_messages_in_json_file()
+        return f"Send ok"
 
     def check_do_u_have_this_nick_in_conversation(self, nick, messages):
         for mess_disct in messages:
@@ -153,18 +167,15 @@ class User:
 
 if __name__ == '__main__':  # !!! bez tego ponizsze linijki beda wywolywane gdy gdzies uzyjemy 'from user import User'
     user = User()
-    user.login("Seba", "qaz123")
-    # user.show_conversation("Olii")
-    user.check_unread_messages()
-    # user.show_conversation("Olii")
-    user.send_text_to("Olaf", ["wiadomosc", "16"])
-    # user.register_new_user()
-    user.update_messages_in_json_file()  # dziala
+    print(user.login("Seba", "qaz123"))
+    # print(user.login("Olaf", "qaz321"))
+    # user.check_unread_messages()
+    # user.send_text_to("Olaf", ["wiadomosc", "17"])
+    # user.show_conversation("Olaf")
 
 """
 TODO
-usuwanie/dodawanie(rejestracja) uzytkownikow # potem usuwanie dokonczyc
-logowanie i wylogowywanie
+usuwanie uzytkownikow # potem usuwanie dokonczyc
 przenies potem dane do postgresqla
 """
 

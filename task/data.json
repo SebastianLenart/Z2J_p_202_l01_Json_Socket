@@ -23,26 +23,6 @@
                             "from_Olii",
                             "1",
                             "2023-06-11 12:59:48"
-                        ],
-                        [
-                            "from_Olii",
-                            "2",
-                            "2023-06-11 13:56:48"
-                        ],
-                        [
-                            "from_Olii",
-                            "3",
-                            "2023-06-11 14:56:48"
-                        ],
-                        [
-                            "from_Olii",
-                            "4",
-                            "2023-06-11 15:56:48"
-                        ],
-                        [
-                            "from_Olii",
-                            "5",
-                            "2023-06-11 16:56:48"
                         ]
                     ]
                 },
@@ -51,19 +31,29 @@
                     "unread": [],
                     "text": [
                         [
-                            "from_Seba",
+                            "from_Olaf",
                             "wiadomosc",
                             "13"
                         ],
                         [
-                            "from_Seba",
+                            "from_Olaf",
                             "wiadomosc",
                             "14"
                         ],
                         [
-                            "from_Seba",
+                            "from_Olaf",
                             "wiadomosc",
                             "15"
+                        ],
+                        [
+                            "send_to_Olaf",
+                            "wiadomosc",
+                            "17"
+                        ],
+                        [
+                            "send_to_Olaf",
+                            "2023-06-18 21:39:47.831665",
+                            "messa"
                         ]
                     ]
                 }
@@ -76,7 +66,8 @@
             "messages": [
                 {
                     "with": "Seba",
-                    "unread": [
+                    "unread": [],
+                    "text": [
                         [
                             "from_Seba",
                             "wiadomosc",
@@ -90,33 +81,37 @@
                         [
                             "from_Seba",
                             "wiadomosc",
-                            "13"
+                            "17"
                         ],
                         [
                             "from_Seba",
-                            "wiadomosc",
-                            "14"
-                        ],
-                        [
-                            "from_Seba",
-                            "wiadomosc",
-                            "15"
-                        ]
-                    ],
-                    "text": [
-                        [
-                            "from_receiver",
                             "Hello Olaf",
                             "2023-06-11 12:57:48"
                         ],
                         [
-                            "send_to_receiver",
+                            "from_Seba",
                             "Hello reveiver",
                             "2023-06-11 12:58:49"
+                        ],
+                        [
+                            "from_Seba",
+                            "2023-06-18 21:39:47.831665",
+                            "messa"
                         ]
                     ]
+                },
+                {
+                    "with": "Olaf",
+                    "unread": [],
+                    "text": []
                 }
             ]
+        },
+        {
+            "nick": "nick1",
+            "password": "pass1",
+            "admin": "admin1",
+            "messages": []
         }
     ]
 }
