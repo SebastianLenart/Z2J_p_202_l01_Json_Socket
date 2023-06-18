@@ -3,19 +3,23 @@ import datetime
 import socket
 from user import User
 
+
 class Serwer:
     HOST = "127.0.0.1"
     PORT = 65432
-    HELP = """uptime - return timelife of server
+    HELP = f"""uptime - return timelife of server
 info - return version and date of create server
 help - return described options, just like that     
 stop - stop server and client
-login - let you login to system
-logout - let you logout from system
-register new user - you can add new user
-profil - show info about register user
-send message - you can send message to receiver
-receiver message - you can get message from receiver"""
+login <nick> <password> - let you login to system
+logout <nick> - let you logout from system
+register <nick> <password> <admin>- only admin can add new user
+info_user <nick> - only admin can see info about everybody
+send <nick> <message> - only register user can send message to receiver
+show_conversation <nick> - only login user see conversation
+show_unread_texts - only login user see unread texts
+list of users - only login user can see list of users
+"""
 
     def __init__(self):
         self.start_time = datetime.datetime.now()
@@ -25,8 +29,13 @@ receiver message - you can get message from receiver"""
         self.lsock.bind((self.HOST, self.PORT))
         self.lsock.listen()
         print(f"Listening on {(self.HOST, self.PORT)}")
-        self.stop = False
-        self.answer_to_send = {"command": {"bład": "Nie rozpoznano polecenia"}}
+        self.stopFlag = False
+        self.answer_to_send = {"command": "Nie rozpoznano polecenia",
+                               "answer": "",
+                               "nick": "",
+                               "password": "",
+                               "admin": "",
+                               "messages": ""}
         self.user = User()
 
     def run(self):
@@ -37,52 +46,72 @@ receiver message - you can get message from receiver"""
             print(f"Connected by {addr}")
             while True:
                 data = conn.recv(1024)
-                print("data1: ", data)
                 sdata = json.loads(data.decode(encoding="utf8"))
                 if not sdata:
                     break
                 self.options(sdata, conn)
-                if self.stop:
+                if self.stopFlag:
                     break
 
     def options(self, data, conn):
-        print("data2: ", data)
-        if data["command"] == "uptime":
+        if data[0] == "uptime":
             self.uptime()
-        if data["command"] == "info":
+        elif data[0] == "info":
             self.info()
-        if data["command"] == "help":
+        elif data[0] == "help":
             self.help()
-        if data["command"] == "stop":
+        elif data[0] == "stop":
             self.stop()
+        elif data[0] == "login":
+            self.login(data)
 
         self.answer_to_send = json.dumps(self.answer_to_send).encode(encoding='utf8')
         conn.sendall(self.answer_to_send)
+        self.default_answer()
 
-        if self.stop:
+        if self.stopFlag:
             self.lsock.close()
 
+    def default_answer(self):
+        self.answer_to_send = {"command": "Nie rozpoznano polecenia",
+                               "answer": "",
+                               "nick": "",
+                               "password": "",
+                               "admin": "",
+                               "messages": ""}
+
     def uptime(self):
-        answer = {"uptime": str(datetime.datetime.now() - self.start_time)[:7]}
-        self.answer_to_send["command"] = answer
-        print(self.answer_to_send["command"])
+        answer = str(datetime.datetime.now() - self.start_time)[:7]
+        self.answer_to_send["command"] = "uptime"
+        self.answer_to_send["answer"] = answer
+        print(self.answer_to_send["answer"])
 
     def info(self):
-        answer = {"info:": f"Version: {'1.0.0'}, date of create server: {self.date_of_create}"}
-        self.answer_to_send["command"] = answer
-        print(self.answer_to_send["command"])
+        answer = f"Version: {'1.0.0'}, date of create server: {self.date_of_create}"
+        self.answer_to_send["command"] = "info"
+        self.answer_to_send["answer"] = answer
+        print(self.answer_to_send["answer"])
 
     def help(self):
-        answer = {"help": self.HELP}
-        self.answer_to_send["command"] = answer
-        print(self.answer_to_send["command"])
+        answer = self.HELP
+        self.answer_to_send["command"] = "help"
+        self.answer_to_send["answer"] = answer
+        print(self.answer_to_send["answer"])
 
     def stop(self):
-        answer = {"stop": "stop"}
-        self.answer_to_send["command"] = answer
-        self.stop = True
-        print(self.answer_to_send["command"])
+        answer = "stop"
+        self.answer_to_send["command"] = "stop"
+        self.answer_to_send["answer"] = answer
+        self.stopFlag = True
+        print(self.answer_to_send["answer"])
 
+    def login(self, data: dict):
+        self.answer_to_send["command"] = "login"
+        self.answer_to_send["answer"] = self.user.login(data[1], data[2])
+        self.answer_to_send["nick"] = self.user.nick
+        # self.answer_to_send["password"] = self.user.password
+        self.answer_to_send["admin"] = self.user.nick
+        print(self.answer_to_send["answer"])
 
 if __name__ == '__main__':
     server = Serwer()

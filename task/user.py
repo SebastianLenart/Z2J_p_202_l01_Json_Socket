@@ -14,7 +14,7 @@ class User:
         self.users_file = None
 
     # add to new user can only admin
-    def register_new_user(self, nick="Default", password="1234", admin=False):
+    def register_new_user(self, nick="Default", password="1234", admin="No admin"):
         if not self.admin:
             print(f"Only admin can add new user!")
             return f"Only admin can add new user!"
@@ -36,28 +36,32 @@ class User:
         return self.users_file["users"]
 
     def show_base_info_about(self, nick):
-        if not self.admin:
+        if self.admin == "admin":
             print(f"Only admin can get info!")
         for user in self.users_file["users"]:
             if user["nick"] == nick:
                 return [user["nick"], user["password"], user["admin"]]
 
-    def login(self, nick: str, password):
+    def login(self, nick: str = "default", password: str = "1234"):
         with open("data.json", "r") as file:
             self.users_file = json.load(file)
-            self.check_user_exists(self.users_file["users"], nick)
+            if not self.check_user_exists(self.users_file["users"], nick):
+                return f"Not found user {nick}"
             for userr in self.users_file["users"]:
                 if userr["nick"] == nick and userr["password"] == password:
                     self.set_data_from_json(**userr)
-                    return
+                    return f"OK"
+                else:
+                    return f"Password is wrong"
 
     def check_user_exists(self, list_users, nick):
         for user_dict in list_users:
             if user_dict["nick"] == nick:
                 return True
-        raise SomethingWrong(f"Not found user {nick}")
+        # raise SomethingWrong(f"Not found user {nick}")
+        return False
 
-    def set_data_from_json(self, nick="default", password="default", admin="default",
+    def set_data_from_json(self, nick="default", password="default", admin="No admin",
                            messages="default"):
         self.nick = nick
         self.password = password
@@ -147,7 +151,7 @@ class User:
                 conversation_person["unread"].append(text)
 
 
-if __name__ == '__main__': # !!! bez tego ponizsze linijki beda wywolywane gdy gdzies uzyjemy 'from user import User'
+if __name__ == '__main__':  # !!! bez tego ponizsze linijki beda wywolywane gdy gdzies uzyjemy 'from user import User'
     user = User()
     user.login("Seba", "qaz123")
     # user.show_conversation("Olii")

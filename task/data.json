@@ -3,7 +3,7 @@
         {
             "nick": "Seba",
             "password": "qaz123",
-            "admin": true,
+            "admin": "admin",
             "messages": [
                 {
                     "with": "Olii",
@@ -72,7 +72,7 @@
         {
             "nick": "Olaf",
             "password": "qaz321",
-            "admin": false,
+            "admin": "No admin",
             "messages": [
                 {
                     "with": "Seba",
