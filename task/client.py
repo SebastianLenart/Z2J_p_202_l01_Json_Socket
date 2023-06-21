@@ -17,7 +17,7 @@ info_user <nick> - only admin can see info about everybody
 send <nick> <message> - only register user can send message to receiver
 show_conversation <nick> - only login user see conversation
 show_unread_texts - only login user see unread texts
-list_of_users - only login user can see list of users
+# list_of_users - only login user can see list of users
 Select option: """
 
     def __init__(self):

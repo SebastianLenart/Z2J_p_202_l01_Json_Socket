@@ -37,6 +37,7 @@ list of users - only login user can see list of users
                                "admin": "default",
                                "messages": ""}
         self.user = User()
+        self.list_of_current_login_users = []
 
     def run(self):
         conn, addr = self.lsock.accept()  # Should be ready to read
@@ -62,7 +63,7 @@ list of users - only login user can see list of users
             "login": lambda nick, password: self.login(nick, password),
             "logout": self.logout,
             "register": lambda nick, password, admin: self.register(nick, password, admin),
-            "info_user": lambda nick : self.info_user(nick),
+            "info_user": lambda nick: self.info_user(nick),
             "send": lambda nick, message: self.send_text_to(nick, message),
             "show_conversation": lambda nick: self.show_conversation(nick),
             "show_unread_texts": self.show_unread_texts
@@ -71,10 +72,13 @@ list of users - only login user can see list of users
             dict_options[data[0]](*data[1:])
         except KeyError:
             self.default_answer()
+        except TypeError:
+            self.default_answer()
+            self.answer_to_send["answer"] = "Za malo przekazanych argumetow"
         self.answer_to_send["command"] = data[0]
         self.answer_to_send = json.dumps(self.answer_to_send).encode(encoding='utf8')
         conn.sendall(self.answer_to_send)
-        # self.default_answer()
+        self.default_answer()
 
         if self.stopFlag:
             self.lsock.close()
@@ -82,14 +86,14 @@ list of users - only login user can see list of users
     def default_answer(self):
         self.answer_to_send = {"command": "Nie rozpoznano polecenia",
                                "answer": "Nie rozpoznano polecenia",
-                               "nick": "default",
+                               # "nick": "default",
                                "password": "",
-                               "admin": "default",
+                               # "admin": "default",
                                "messages": ""}
 
     def uptime(self):
         answer = str(datetime.datetime.now() - self.start_time)[:7]
-        self.answer_to_send["answer"] = answer # na zalogowanym Sebie wywala mi tutaj błąd !!!!!
+        self.answer_to_send["answer"] = answer  # na zalogowanym Sebie wywala mi tutaj błąd !!!!!
         print(self.answer_to_send["answer"])
 
     def info(self):
@@ -118,14 +122,14 @@ list of users - only login user can see list of users
     def logout(self):
         del self.user
         self.user = User()
-        self.default_answer()
-        self.answer_to_send["answer"] = "logout"
+        self.answer_to_send = {"command": "Nie rozpoznano polecenia", "answer": "logout", "nick": "default",
+                               "password": "", "admin": "default", "messages": ""}
         print("Logout")
 
     def register(self, nick, password, admin):
         self.answer_to_send["answer"] = self.user.register_new_user(nick, password, admin)
-        self.answer_to_send["nick"] = "default"
-        self.answer_to_send["admin"] = "default"
+        # self.answer_to_send["nick"] = "default"
+        # self.answer_to_send["admin"] = "default"
         # print("Register done") # nieprawda bo jak nie bedzie admina to tez sie wyswietli..trzeba ifa dac
 
     def info_user(self, nick):
