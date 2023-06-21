@@ -177,6 +177,7 @@ if __name__ == '__main__':  # !!! bez tego ponizsze linijki beda wywolywane gdy 
 TODO
 usuwanie uzytkownikow # potem usuwanie dokonczyc
 przenies potem dane do postgresqla
+jezeli pusta konwersacja lun unread to wyswietlic empty w cliencie !!!
 """
 
 """
