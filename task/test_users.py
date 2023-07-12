@@ -25,7 +25,15 @@ def test_show_list_users():
 def test_show_base_info_about():
     user = User()
     user.admin = "admin"
-    user.users_file = {"users": []}
+    new_user = {
+        "nick": "nick1",
+        "password": "password1",
+        "admin": "admin1",
+        "messages": []
+    }
+    user.users_file = {"users": [new_user]}
+    result = user.show_base_info_about("nick1")
+    assert result == f"nick1, password1, admin1"
 
 
 
