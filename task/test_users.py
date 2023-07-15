@@ -66,15 +66,113 @@ def test_check_unread_messages():
     ]
     user.users_file = {"users": []}
     result = user.check_unread_messages()[0]
-    assert result ==  [
-                    "send_to_receiver",
-                    "Hello reveiver",
-                    "2023-06-11 12:56:59"
-                ]
+    assert result == [
+        "send_to_receiver",
+        "Hello reveiver",
+        "2023-06-11 12:56:59"
+    ]
 
 
-# musi byc na koncu bo nadpisuje plik data.json
-# po tym tescie resetuje sie plik data.json trzeba go przywrocic
+def test_check_bufor_in_receiver():
+    user = User()
+    user.nick = "Seba"
+    user.users_file = {"users": [
+        {
+            "nick": "Seba",
+            "password": "qaz123",
+            "admin": True,
+            "messages": [
+                {
+                    "with": "Olaf",
+                    "unread": [],
+                    "text": [
+                        [
+                            "from_receiver",
+                            "Hello Seba",
+                            "2023-06-11 12:56:48"
+                        ],
+                        [
+                            "send_to_receiver",
+                            "Hello reveiver",
+                            "2023-06-11 12:56:49"
+                        ]
+                    ]
+                }
+            ]
+        }
+    ]
+    }
+    result = user.check_bufor_in_receiver("Olaf")
+    assert result == False
+
+
+def test_sent_to_receiver():
+    user = User()
+    user.nick = "Seba"
+    # niepotrzebnie powielane, ale za pozno zeby cala aplikacje zmieniac
+    user.messages = [
+                {
+                    "with": "Olaf",
+                    "unread": [],
+                    "text": [
+                        [
+                            "from_receiver",
+                            "Hello Seba",
+                            "2023-06-11 12:56:48"
+                        ],
+                        [
+                            "send_to_receiver",
+                            "Hello reveiver",
+                            "2023-06-11 12:56:49"
+                        ]
+                    ]
+                }
+            ]
+    user.users_file = {"users": [
+        {
+            "nick": "Seba",
+            "password": "qaz123",
+            "admin": True,
+            "messages": [
+                {
+                    "with": "Olaf",
+                    "unread": [],
+                    "text": [
+                        [
+                            "from_receiver",
+                            "Hello Seba",
+                            "2023-06-11 12:56:48"
+                        ],
+                        [
+                            "send_to_receiver",
+                            "Hello reveiver",
+                            "2023-06-11 12:56:49"
+                        ]
+                    ]
+                }
+            ]
+        },
+        {
+            "nick": "Olaf",
+            "password": "qaz123",
+            "admin": True,
+            "messages": [{
+                "with": "Olaf",
+                "unread": [],
+                "text": []
+            }
+            ]
+        }
+    ]
+    }
+    result = user.send_text_to("Olaf", ["Hello reveiver",
+                            "2023-06-11 12:56:49"])
+    assert result == f"Send ok"
+
+    # musi byc na koncu bo nadpisuje plik data.json
+    # po tym tescie resetuje sie plik data.json trzeba go przywrocic
+
+
 def test_test_register_new_user():
     user = User()
     user.admin = "admin"

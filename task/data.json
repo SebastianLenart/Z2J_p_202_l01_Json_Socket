@@ -1,87 +1,10 @@
 {
-  "users": [
-    {
-      "nick": "Seba",
-      "password": "qaz123",
-      "admin": true,
-      "messages": [
+    "users": [
         {
-          "with": "Olaf",
-          "unread": [],
-          "text": [
-            [
-              "from_receiver",
-              "Hello Seba",
-              "2023-06-11 12:56:48"
-            ],
-            [
-              "send_to_receiver",
-              "Hello reveiver",
-              "2023-06-11 12:56:49"
-            ]
-          ]
-        },
-        {
-          "with": "Olii",
-          "unread": [
-            [
-              "1",
-              "2023-06-11 12:59:48"
-            ],
-            [
-              "2",
-              "2023-06-11 13:56:48"
-            ],
-            [
-              "3",
-              "2023-06-11 14:56:48"
-            ],
-            [
-              "4",
-              "2023-06-11 15:56:48"
-            ],
-            [
-              "5",
-              "2023-06-11 16:56:48"
-            ]
-          ],
-          "text": [
-            [
-              "from_receiver",
-              "Hello Seba",
-              "2023-06-11 12:56:48"
-            ],
-            [
-              "send_to_receiver",
-              "Hello reveiver",
-              "2023-06-11 12:56:49"
-            ]
-          ]
+            "nick": "nick1",
+            "password": "qwe",
+            "admin": "no admin",
+            "messages": []
         }
-      ]
-    },
-    {
-      "nick": "Olaf",
-      "password": "qaz321",
-      "admin": false,
-      "messages": [
-        {
-          "with": "Seba",
-          "unread": [],
-          "text": [
-            [
-              "from_receiver",
-              "Hello Olaf",
-              "2023-06-11 12:57:48"
-            ],
-            [
-              "send_to_receiver",
-              "Hello reveiver",
-              "2023-06-11 12:58:49"
-            ]
-          ]
-        }
-      ]
-    }
-  ]
+    ]
 }
