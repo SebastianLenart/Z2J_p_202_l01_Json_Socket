@@ -182,7 +182,9 @@ def test_test_register_new_user():
 
 
 """
-testy musza byc w tym samym folderze!
+testy musza byc w tym samym folderze! bo inaczej sa z w innym folderze i robie 
+from task.user import User to wyskakuje błąd:( możliwe że przy unittest działa, 
+ale kiedys robiłem pytest i chciałem zostaćprzy tym
 python -m pytest test_users.py -vvv
 
 
