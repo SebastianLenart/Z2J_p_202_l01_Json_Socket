@@ -1,0 +1,73 @@
+tranzacje: BEGIN ROLLBACK/COMMIT
+kiedy po begin mamy bledne zapytanie sql i wywala blad trzeba rollback i ponownie begin i teraz zadac dobre querysql
+coalesce??
+Funkcja COALESCE przyjmuje dwa argumenty. Pierwszym jest nazwa pola, które może przyjmować wartość null, a druga,
+to wartość, jaka ma być zwrócona gdy tak właśnie się stało.
+W naszym przypadku, wartości null, w polu Active oznaczają, że szpital jest aktywny, dlatego zwracam True (pamiętaj, że
+zwracana wartość musi być typu zgodnego z typem pola, pole active jest typu Boolean, więc można zwracać, true, albo false).
+
+sample query:
+update supplies set mask = mask + 100 where hospital_id in (3, 6); -- lub w in (select ..)
+select * from supplies where coalesce(active, true)
+
+insert into delivery
+  select hospital_id, now(), mask, suit
+  from supplies;
+
+
+/h truncate  jest lepsze od delete!!!
+
+
+INDEKSY:
+EXPLAIN ANALYSE
+pamietaj o begin rollback/commit
+
+create sequence seria start 5000
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

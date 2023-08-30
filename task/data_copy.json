@@ -67,8 +67,7 @@
       "messages": [
         {
           "with": "Seba",
-          "unread": [],
-          "text": [
+          "unread": [
             [
               "from_receiver",
               "Hello Olaf",
@@ -79,6 +78,8 @@
               "Hello reveiver",
               "2023-06-11 12:58:49"
             ]
+          ],
+          "text": [
           ]
         }
       ]
