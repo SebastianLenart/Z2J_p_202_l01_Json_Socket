@@ -18,9 +18,9 @@ class User:
     # add to new user can only admin
     def register_new_user(self, nick="Default", password="1234", admin=False):
         with GetConnection() as connection:
-            # if not self.admin:
-            #     print(f"Only admin can add new user!")
-            #     return f"Only admin can add new user!"
+            if not self.admin:
+                print(f"Only admin can add new user!")
+                return f"Only admin can add new user!"
             for user in database.get_list_nicks(connection):
                 if user[0] == nick:
                     return f"This nick is busy."
@@ -34,7 +34,8 @@ class User:
             return f"Register done!"
 
     def show_list_users(self):
-        return self.users_file["users"]
+        with GetConnection() as connection:
+            return [element[0] for element in database.get_list_nicks(connection)]
 
     def show_base_info_about(self, nick):
         if self.admin != "admin":
@@ -172,7 +173,7 @@ class User:
 
 if __name__ == '__main__':
     user = User()
-    user.register_new_user()
+    pprint(user.show_list_users())
 
 
 

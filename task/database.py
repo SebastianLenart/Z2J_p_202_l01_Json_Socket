@@ -33,4 +33,4 @@ def get_list_nicks(connection):
 def add_new_user(connection, nick, password, admin):
     with connection.get_cursor() as cursor:
         cursor.execute(INSERT_NEW_USER, (nick, password, admin))
-        return cursor.fetchall()
+        return cursor.fetchall()[0]
