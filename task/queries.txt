@@ -32,14 +32,37 @@ order by m."time" asc;
 -- DOIT
 
 --check_unread_messages -> COUNT
-select a.nick as receiver, (select nick from account, conversation
-where account.id_account = conversation.id_sender and
-c.id_sender = conversation.id_sender) as sender, m.receiver_sender, m."content", m.is_read  from account a
-inner join conversation c on a.id_account = c.id_receiver
+select a.nick, (select aa.nick as _from from
+account aa
+where aa.id_account = (select case
+	when cc.id_receiver = a.id_account then cc.id_sender
+	else cc.id_receiver
+end as return_value
+from conversation cc
+where cc.id_conversation = c.id_conversation)), count(m.is_read is null) as unread_messages
+from account a, conversation c
 inner join message m on m.id_conversation = c.id_conversation
-where (c.id_receiver = (select aa.id_account from account aa where aa.nick = 'Seba') and
-m.receiver_sender = 'send_to_receiver') or c.id_sender  = (select aa.id_account from account aa where aa.nick = 'Seba') and
-m.receiver_sender = 'from_receiver';
+where (a.nick = 'Seba' and ((c.id_receiver = a.id_account and m.receiver_sender = 'send_to_receiver')
+or (c.id_sender = a.id_account and m.receiver_sender = 'from_receiver')) and m.is_read = False)
+group by a.nick, _from;
+
+
+-- read_unread_messages -> SHOW
+select a.nick, c.id_conversation, (select aa.nick as _from from
+account aa
+where aa.id_account = (select case
+	when cc.id_receiver = a.id_account then cc.id_sender
+	else cc.id_receiver
+end as return_value
+from conversation cc
+where cc.id_conversation = c.id_conversation)),
+m."content" as unread_message
+from account a, conversation c
+inner join message m on m.id_conversation = c.id_conversation
+where (a.nick = 'Seba' and ((c.id_receiver = a.id_account and m.receiver_sender = 'send_to_receiver')
+or (c.id_sender = a.id_account and m.receiver_sender = 'from_receiver')) and m.is_read = FALSE)
+order by c.id_conversation;
+
 
 
 -- m.from_receiver odnosi sie do c.receiver i viceversa

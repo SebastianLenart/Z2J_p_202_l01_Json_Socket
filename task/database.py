@@ -1,4 +1,4 @@
-
+from pprint import pprint
 
 CREATE_ACCOUNT = """CREATE TABLE IF NOT EXISTS account 
 (id_account SERIAL PRIMARY KEY, nick TEXT, password TEXT, admin BOOLEAN);"""
@@ -12,11 +12,25 @@ CREATE_MESSAGE = """CREATE TABLE IF NOT EXISTS message
 (id_message SERIAL PRIMARY KEY, receiver_sender TEXT, content TEXT, time TEXT, is_read BOOLEAN,
 id_conversation INTEGER, FOREIGN KEY(id_conversation) REFERENCES conversation (id_conversation));"""
 
-"""select a.nick as receiver, (select nick from account, conversation
-where account.id_account = conversation.id_sender and
-c.id_sender = conversation.id_sender) as sender, m.receiver_sender, m."content", m.is_read  from account a
-inner join conversation c on a.id_account = c.id_receiver
-inner join message m on m.id_conversation = c.id_conversation
-where (c.id_receiver = (select aa.id_account from account aa where aa.nick = 'Seba') and
-m.receiver_sender = 'send_to_receiver') or c.id_sender  = (select aa.id_account from account aa where aa.nick = 'Seba') and
-m.receiver_sender = 'from_receiver';"""
+SELECT_LIST_USERS = """select nick from account;"""
+INSERT_NEW_USER = """INSERT INTO account (nick, password, admin) 
+VALUES (%s, %s, %s) RETURNING id_account;"""
+
+
+def change_sth_test(connetion):
+    with connetion.get_cursor() as cursor:
+        cursor.execute("""update message
+    set content = 'He Ol'
+    where id_message = 1;""")
+
+
+def get_list_nicks(connection):
+    with connection.get_cursor() as cursor:
+        cursor.execute(SELECT_LIST_USERS)
+        return cursor.fetchall()
+
+
+def add_new_user(connection, nick, password, admin):
+    with connection.get_cursor() as cursor:
+        cursor.execute(INSERT_NEW_USER, (nick, password, admin))
+        return cursor.fetchall()
