@@ -14,7 +14,6 @@ class User:
         self.messages = None
         self.users_file = None
 
-
     # add to new user can only admin
     def register_new_user(self, nick="Default", password="1234", admin=False):
         with GetConnection() as connection:
@@ -76,7 +75,7 @@ class User:
 
     def show_conversation(self, nick):
         self.check_do_u_have_this_nick_in_conversation(nick, self.messages)
-        self.check_unread_messages() # odczytuje nieodczytane, ale wszystkie, nie tylko od tego konkretnego usera...
+        self.check_unread_messages()  # odczytuje nieodczytane, ale wszystkie, nie tylko od tego konkretnego usera...
         sorted_messages = self.sort_messages_by_date(nick)
         print(f"Conversation with {nick}")
         return_list = []
@@ -136,7 +135,7 @@ class User:
 
     def send_text_to(self, send_to_nick, text: list):
         if not self.check_user_exists(self.users_file["users"], send_to_nick):
-            return f"Not found user {send_to_nick}" # niemożemy wyslac do osoby ktora nie istnieje
+            return f"Not found user {send_to_nick}"  # niemożemy wyslac do osoby ktora nie istnieje
         if self.check_bufor_in_receiver(send_to_nick):
             return f"Bufor is full, you cant sent text"
         text.insert(0, f"send_to_{send_to_nick}")
@@ -167,16 +166,9 @@ class User:
                 conversation_person["unread"].append(text)
 
 
-
-
-
-
 if __name__ == '__main__':
     user = User()
     pprint(user.show_list_users())
-
-
-
 
 """
 if __name__ == '__main__':  # !!! bez tego ponizsze linijki beda wywolywane gdy gdzies uzyjemy 'from user import User'
@@ -188,39 +180,3 @@ if __name__ == '__main__':  # !!! bez tego ponizsze linijki beda wywolywane gdy 
     # user.show_conversation("Olaf")
 
 """
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
