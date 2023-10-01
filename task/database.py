@@ -50,6 +50,35 @@ inner join message m on m.id_conversation = c.id_conversation
 where (a.nick = %s and ((c.id_receiver = a.id_account and m.receiver_sender = 'send_to_receiver')
 or (c.id_sender = a.id_account and m.receiver_sender = 'from_receiver')) and m.is_read = FALSE)
 order by c.id_conversation, m."time" ;"""
+SELECT_CONVERSATION_WITH_SB = """select (select nick from account a
+where a.id_account = c.id_receiver) as receiver, (select nick from account a
+where a.id_account = c.id_sender) as sender, m.receiver_sender, m."content", m."time"from conversation c 
+inner join message m on m.id_conversation = c.id_conversation 
+where (select a2.id_account from account a2 where a2.nick = %s) in (id_receiver,id_sender) 
+and (select a2.id_account from account a2 where a2.nick = %s) in (id_receiver,id_sender)
+order by m."time";"""
+SELECT_COUNTER_UNREAD_WITH_SB = """create OR REPLACE view count_unread as select a.nick, (select aa.nick as _from from
+account aa
+where aa.id_account = (select case 
+	when cc.id_receiver = a.id_account then cc.id_sender
+	else cc.id_receiver
+end as return_value
+from conversation cc 
+where cc.id_conversation = c.id_conversation)) as _from, count(m.is_read is null) as unread_messages
+from account a, conversation c 
+inner join message m on m.id_conversation = c.id_conversation 
+where (a.nick = %s and ((c.id_receiver = a.id_account and m.receiver_sender = 'send_to_receiver')
+or (c.id_sender = a.id_account and m.receiver_sender = 'from_receiver')) and m.is_read = False)
+group by a.nick, _from;
+select * from count_unread where _from = %s;"""
+SELECT_SENDER_OR_RECEIVER = """select nick, case 
+	when a4.id_account = c.id_receiver then 'from_receiver'
+	when a4.id_account = c.id_sender  then 'send_to_receiver'
+end as return_value
+from conversation c
+inner join account a4 on a4.id_account = (select a2.id_account from account a2 where a2.nick = %s)
+where a4.id_account in (id_receiver,id_sender) and 
+(select a3.id_account from account a3 where a3.nick = %s) in (id_receiver,id_sender);"""
 INSERT_NEW_USER = """INSERT INTO account (nick, password, admin) 
 VALUES (%s, %s, %s) RETURNING id_account;"""
 UPDATE_UNREAD_MESSAGES = """update message 
@@ -109,3 +138,23 @@ def update_unread_message(connection, id_message):
     with connection.get_cursor() as cursor:
         cursor.execute(UPDATE_UNREAD_MESSAGES, (id_message,))
 
+
+def get_conversation_by_nick(connection, my_account="Seba", with_nick="Olaf"):
+    with connection.get_cursor() as cursor:
+        cursor.execute(SELECT_CONVERSATION_WITH_SB, (my_account, with_nick))
+        return cursor.fetchall()
+
+
+def get_counter_unread_messages_with_sb(connection, my_nick="Seba", with_nick="Olaf"):
+    with connection.get_cursor() as cursor:
+        cursor.execute(SELECT_COUNTER_UNREAD_WITH_SB, (my_nick, with_nick))
+        return cursor.fetchall()[0]
+
+
+def determine_sender_or_receiver(connection, my_nick="Seba", with_nick="Olaf"):
+    with connection.get_cursor() as cursor:
+        cursor.execute(SELECT_SENDER_OR_RECEIVER, (my_nick, with_nick))
+        return cursor.fetchall()
+
+def add_conversation(connection, my_nick="Seba", with_nick="Default"):
+    pass

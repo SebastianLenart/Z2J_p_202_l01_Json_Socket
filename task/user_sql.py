@@ -52,12 +52,13 @@ class User:
                 return f"Login"
         return f"Password is wrong"
 
-    # def check_user_exists(self, list_users, nick):
-    #     for user_dict in list_users:
-    #         if user_dict["nick"] == nick:
-    #             return True
-    #     # raise SomethingWrong(f"Not found user {nick}")
-    #     return False
+    def check_user_exists(self, nick="Olaf"):
+        with GetConnection() as connection:
+            for user in database.get_list_nicks(connection):
+                if user[0] == nick:
+                    return True
+            # raise SomethingWrong(f"Not found user {nick}")
+            return False
 
     def set_data_from_db(self, nick="default", password="default", admin="False"):
         self.nick = nick
@@ -67,28 +68,26 @@ class User:
     # def print_nick(self):
     #     print(self.nick, self.password, self.admin)
 
-    def show_conversation(self, nick):
-        if not self.check_do_u_have_this_nick_in_conversation(nick):
+    def show_conversation(self, nick="Olaf"):
+        if not self.check_do_u_have_this_nick_in_conversation(nick):  # dodaj self.nick
             print("You dont have this nick in conversation")
             return
         self.check_unread_messages()
         self.read_unread_messages()
         sorted_messages = self.sort_messages_by_date(nick)
-        print(f"Conversation with {nick}")
-        return_list = []
-        for from_, text, date in sorted_messages:
-            return_list.append([from_, text, date])
-        if not return_list:
+        print(f"Conversation with {nick}:")
+        if len(sorted_messages) == 0:
             print("- Empty")
-        only_text = list(map(lambda x: x[1], sorted_messages))
+        only_text = list(map(lambda x: x[3], sorted_messages))
         # pprint(only_text)
-        return return_list
+        return sorted_messages
 
-    def sort_messages_by_date(self, from_nick="Oli"):
-        for text in self.messages:
-            if text["with"] == from_nick:
-                text["text"] = sorted(text["text"], key=lambda x: x[2])
-                return text["text"]
+    def sort_messages_by_date(self, from_nick="Olaf"):
+        with GetConnection() as connection:
+            messages_from_sb = database.get_conversation_by_nick(connection)  # dodaj nicki!!!!
+            # messages_from_sb_sort_reverse = sorted(messages_from_sb, key=lambda x: x[4], reverse=True)
+            # pprint(messages_from_sb_sort_reverse)
+            return messages_from_sb
 
     def check_unread_messages(self):
         with GetConnection() as connection:
@@ -108,42 +107,49 @@ class User:
                 database.update_unread_message(connection, text[2])
         return unread_messages
 
-    def add_to_read_text(self, text, messages):
-        messages["text"].append(text)
+    # def add_to_read_text(self, text, messages):
+    #     messages["text"].append(text)
 
-    def update_messages_in_json_file(self):
-        for user in self.users_file["users"]:
-            if user["nick"] == self.nick:
-                user["messages"] = self.messages
-                break
-        with open("data.json", "w") as write:
-            json.dump(self.users_file, write, indent=4)  # dziwne, inne usery tez sie zapisuja, ale to dobrze!
+    # def update_messages_in_json_file(self):
+    #     for user in self.users_file["users"]:
+    #         if user["nick"] == self.nick:
+    #             user["messages"] = self.messages
+    #             break
+    #     with open("data.json", "w") as write:
+    #         json.dump(self.users_file, write, indent=4)  # dziwne, inne usery tez sie zapisuja, ale to dobrze!
 
-    def check_bufor_in_receiver(self, nick):
-        for user_dict in self.users_file["users"]:
-            if user_dict["nick"] == nick:
-                for conversation in user_dict["messages"]:
-                    if conversation["with"] == self.nick:
-                        if len(conversation["unread"]) >= self.BUFOR_MESSAGES:
-                            return True
-        return False
+    def check_bufor_in_receiver(self, nick="Olaf"):
+        with GetConnection() as connection:
+            counter_unread_messages = database.get_counter_unread_messages_with_sb(connection)  # dodaj nicki!!!
+            if counter_unread_messages[2] >= self.BUFOR_MESSAGES:
+                return True
+            return False
 
-    def send_text_to(self, send_to_nick, text: list):
-        if not self.check_user_exists(self.users_file["users"], send_to_nick):
+    def send_text_to(self, send_to_nick="Olaf", text: list = ["sth"]):
+        if not self.check_user_exists(send_to_nick):
             return f"Not found user {send_to_nick}"  # niemożemy wyslac do osoby ktora nie istnieje
         if self.check_bufor_in_receiver(send_to_nick):
             return f"Bufor is full, you cant sent text"
-        text.insert(0, f"send_to_{send_to_nick}")
-        conversation_person = self.check_do_u_have_this_nick_in_conversation(send_to_nick, self.messages)
-        # save data in my profil and his/her profil as well
-        conversation_person["text"].append(text)
-        text2 = text[:]
-        text2[0] = f"from_{self.nick}"
-        self.save_unread_text_in_receiver(send_to_nick, text2)
-        self.update_messages_in_json_file()
-        return f"Send ok"
 
-    def check_do_u_have_this_nick_in_conversation(self, nick):
+        with GetConnection() as connection:
+            sender_or_receiver = database.determine_sender_or_receiver(connection)[0]
+            text.insert(0, f"{sender_or_receiver[1]}")
+            if not self.check_do_u_have_this_nick_in_conversation(send_to_nick):  # dodaj self.nick
+                print("You dont have this nick in conversation, Now it's going to be added")
+                database.add_conversation(connection) # dodaj nicki!!!
+
+
+
+
+            # save data in my profil and his/her profil as well
+            # conversation_person["text"].append(text)
+            # text2 = text[:]
+            # text2[0] = f"from_{self.nick}"
+            # self.save_unread_text_in_receiver(send_to_nick, text2)
+            # self.update_messages_in_json_file()
+            # return f"Send ok"
+
+    def check_do_u_have_this_nick_in_conversation(self, nick="Olaf"):
         with GetConnection() as connection:
             list_users = database.get_nicks_conversation(connection)  # dodaj self.nick ale dopiero po zalogowaniu!!!
             for user in list_users:
@@ -166,7 +172,8 @@ class User:
 
 if __name__ == '__main__':
     user = User()
-    user.read_unread_messages()
+    pprint(user.send_text_to())
+
 """
 if __name__ == '__main__':  # !!! bez tego ponizsze linijki beda wywolywane gdy gdzies uzyjemy 'from user import User'
     user = User()
