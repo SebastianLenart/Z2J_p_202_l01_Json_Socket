@@ -81,9 +81,18 @@ where a4.id_account in (id_receiver,id_sender) and
 (select a3.id_account from account a3 where a3.nick = %s) in (id_receiver,id_sender);"""
 INSERT_NEW_USER = """INSERT INTO account (nick, password, admin) 
 VALUES (%s, %s, %s) RETURNING id_account;"""
+INSERT_NEW_CONVERSATION = """insert into conversation (id_receiver, id_sender)
+VALUES((select a.id_account from account a where a.nick=%s), 
+(select a2.id_account from account a2 where a2.nick=%s)) returning id_conversation;"""
 UPDATE_UNREAD_MESSAGES = """update message 
 set is_read = True
 where id_message = %s;"""
+
+"""
+zerowanie licznika klucza głównego:
+ALTER SEQUENCE conversation_id_conversation_seq RESTART WITH 1;
+
+"""
 
 
 def change_sth_test(connetion):
@@ -156,5 +165,8 @@ def determine_sender_or_receiver(connection, my_nick="Seba", with_nick="Olaf"):
         cursor.execute(SELECT_SENDER_OR_RECEIVER, (my_nick, with_nick))
         return cursor.fetchall()
 
+
 def add_conversation(connection, my_nick="Seba", with_nick="Default"):
-    pass
+    with connection.get_cursor() as cursor:
+        cursor.execute(INSERT_NEW_CONVERSATION, (with_nick, my_nick))
+        return cursor.fetchall()

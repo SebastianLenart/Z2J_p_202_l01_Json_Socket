@@ -136,7 +136,7 @@ class User:
             text.insert(0, f"{sender_or_receiver[1]}")
             if not self.check_do_u_have_this_nick_in_conversation(send_to_nick):  # dodaj self.nick
                 print("You dont have this nick in conversation, Now it's going to be added")
-                database.add_conversation(connection) # dodaj nicki!!!
+                print(database.add_conversation(connection)) # dodaj nicki!!!
 
 
 
