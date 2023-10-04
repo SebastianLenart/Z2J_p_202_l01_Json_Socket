@@ -2,6 +2,7 @@ from connect_sql import GetConnection
 import database
 import json
 from pprint import pprint
+import datetime
 
 
 class User:
@@ -37,7 +38,7 @@ class User:
             return [element[0] for element in database.get_list_nicks(connection)]
 
     def show_base_info_about(self, nick):
-        if self.admin != "admin":
+        if not self.admin:
             return f"Only admin can get info!"
         with GetConnection() as connection:
             return database.get_base_info(connection, nick)
@@ -65,11 +66,8 @@ class User:
         self.password = password
         self.admin = admin
 
-    # def print_nick(self):
-    #     print(self.nick, self.password, self.admin)
-
     def show_conversation(self, nick="Olaf"):
-        if not self.check_do_u_have_this_nick_in_conversation(nick):  # dodaj self.nick
+        if not self.check_do_u_have_this_nick_in_conversation(nick):
             print("You dont have this nick in conversation")
             return
         self.check_unread_messages()
@@ -84,7 +82,7 @@ class User:
 
     def sort_messages_by_date(self, from_nick="Olaf"):
         with GetConnection() as connection:
-            messages_from_sb = database.get_conversation_by_nick(connection)  # dodaj nicki!!!!
+            messages_from_sb = database.get_conversation_by_nick(connection, self.nick, from_nick)
             # messages_from_sb_sort_reverse = sorted(messages_from_sb, key=lambda x: x[4], reverse=True)
             # pprint(messages_from_sb_sort_reverse)
             return messages_from_sb
@@ -92,7 +90,7 @@ class User:
     def check_unread_messages(self):
         with GetConnection() as connection:
             counter_unread = database.get_counter_unread_messages(
-                connection)  # dodaj self.nick ale dopiero po zalogowaniu!!!
+                connection, self.nick)
             if len(counter_unread) == 0:
                 return []
             for unread in counter_unread:
@@ -101,31 +99,23 @@ class User:
 
     def read_unread_messages(self):
         with GetConnection() as connection:
-            unread_messages = database.get_unread_messages(connection)  # dodaj self.nick ale dopiero po zalogowaniu!!!
+            unread_messages = database.get_unread_messages(connection, self.nick)
             for text in unread_messages:
                 print(f"{text[0]} have unread message(s) from {text[3]}: {text[4]}")
                 database.update_unread_message(connection, text[2])
         return unread_messages
 
-    # def add_to_read_text(self, text, messages):
-    #     messages["text"].append(text)
-
-    # def update_messages_in_json_file(self):
-    #     for user in self.users_file["users"]:
-    #         if user["nick"] == self.nick:
-    #             user["messages"] = self.messages
-    #             break
-    #     with open("data.json", "w") as write:
-    #         json.dump(self.users_file, write, indent=4)  # dziwne, inne usery tez sie zapisuja, ale to dobrze!
-
     def check_bufor_in_receiver(self, nick="Olaf"):
         with GetConnection() as connection:
-            counter_unread_messages = database.get_counter_unread_messages_with_sb(connection)  # dodaj nicki!!!
+            try:
+                counter_unread_messages = database.get_counter_unread_messages_with_sb(connection, self.nick, nick)
+            except IndexError:
+                counter_unread_messages = 0
             if counter_unread_messages[2] >= self.BUFOR_MESSAGES:
                 return True
             return False
 
-    def send_text_to(self, send_to_nick="Olaf", text: list = ["sth"]):
+    def send_text_to(self, send_to_nick="Olaf", text: list = [str(datetime.datetime.now()), "sth"]):
         if not self.check_user_exists(send_to_nick):
             return f"Not found user {send_to_nick}"  # niemożemy wyslac do osoby ktora nie istnieje
         if self.check_bufor_in_receiver(send_to_nick):
@@ -134,40 +124,20 @@ class User:
         with GetConnection() as connection:
             sender_or_receiver = database.determine_sender_or_receiver(connection)[0]
             text.insert(0, f"{sender_or_receiver[1]}")
-            if not self.check_do_u_have_this_nick_in_conversation(send_to_nick):  # dodaj self.nick
+            if not self.check_do_u_have_this_nick_in_conversation(send_to_nick):
                 print("You dont have this nick in conversation, Now it's going to be added")
-                print(database.add_conversation(connection)) # dodaj nicki!!!
-
-
-
-
-            # save data in my profil and his/her profil as well
-            # conversation_person["text"].append(text)
-            # text2 = text[:]
-            # text2[0] = f"from_{self.nick}"
-            # self.save_unread_text_in_receiver(send_to_nick, text2)
-            # self.update_messages_in_json_file()
-            # return f"Send ok"
+                print(database.add_conversation(connection, self.nick, send_to_nick))
+            id_conversation = database.get_id_conversation(connection,self.nick, send_to_nick)
+            print("id_message", database.add_message(connection, text[:], id_conversation))
+            return f"Send ok"
 
     def check_do_u_have_this_nick_in_conversation(self, nick="Olaf"):
         with GetConnection() as connection:
-            list_users = database.get_nicks_conversation(connection)  # dodaj self.nick ale dopiero po zalogowaniu!!!
+            list_users = database.get_nicks_conversation(connection, self.nick)  # dodaj self.nick ale dopiero po zalogowaniu!!!
             for user in list_users:
                 if nick == user[0]:
                     return True
             return False
-            # self.messages.append({
-            #     "with": nick,
-            #     "unread": [],
-            #     "text": []
-            # })
-            # return self.messages[-1]
-
-    def save_unread_text_in_receiver(self, nick, text: list):
-        for user_dict in self.users_file["users"]:
-            if user_dict["nick"] == nick:
-                conversation_person = self.check_do_u_have_this_nick_in_conversation(self.nick, user_dict["messages"])
-                conversation_person["unread"].append(text)
 
 
 if __name__ == '__main__':

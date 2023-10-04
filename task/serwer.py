@@ -1,7 +1,7 @@
 import json
 import datetime
 import socket
-from user import User
+from user_sql import User
 
 
 class Serwer:

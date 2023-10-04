@@ -79,11 +79,16 @@ from conversation c
 inner join account a4 on a4.id_account = (select a2.id_account from account a2 where a2.nick = %s)
 where a4.id_account in (id_receiver,id_sender) and 
 (select a3.id_account from account a3 where a3.nick = %s) in (id_receiver,id_sender);"""
+SELECT_ID_CONVERSATION = """select c.id_conversation  from conversation c 
+where (select a.id_account from account a where a.nick=%s) in (c.id_receiver, c.id_sender) and 
+(select a2.id_account from account a2 where a2.nick=%s) in (c.id_receiver, c.id_sender)"""
 INSERT_NEW_USER = """INSERT INTO account (nick, password, admin) 
 VALUES (%s, %s, %s) RETURNING id_account;"""
 INSERT_NEW_CONVERSATION = """insert into conversation (id_receiver, id_sender)
 VALUES((select a.id_account from account a where a.nick=%s), 
 (select a2.id_account from account a2 where a2.nick=%s)) returning id_conversation;"""
+INSERT_MESSAGE = """insert into message (receiver_sender, content, time, is_read, id_conversation) 
+values (%s, %s, %s, %s, %s) RETURNING id_message;"""
 UPDATE_UNREAD_MESSAGES = """update message 
 set is_read = True
 where id_message = %s;"""
@@ -170,3 +175,15 @@ def add_conversation(connection, my_nick="Seba", with_nick="Default"):
     with connection.get_cursor() as cursor:
         cursor.execute(INSERT_NEW_CONVERSATION, (with_nick, my_nick))
         return cursor.fetchall()
+
+
+def get_id_conversation(connection, nick1="Seba", nick2="Olaf"):
+    with connection.get_cursor() as cursor:
+        cursor.execute(SELECT_ID_CONVERSATION, (nick1, nick2))
+        return cursor.fetchone()[0]
+
+
+def add_message(connection, text, id_conversation):
+    with connection.get_cursor() as cursor:
+        cursor.execute(INSERT_MESSAGE, (text[0], text[1], text[2], "False", id_conversation))
+        return cursor.fetchall()[0]
