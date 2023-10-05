@@ -105,6 +105,7 @@ class User:
             for text in unread_messages:
                 print(f"{text[0]} have unread message(s) from {text[3]}: {text[4]}")
                 database.update_unread_message(connection, text[2])
+            unread_messages2 = list(map(lambda x: x[1], unread_messages))
         return unread_messages
 
     def check_bufor_in_receiver(self, nick="Olaf"):

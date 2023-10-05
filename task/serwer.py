@@ -152,7 +152,7 @@ list of users - only login user can see list of users
     def show_unread_texts(self):
         if self.current_login():
             return
-        self.answer_to_send["answer"] = self.user.check_unread_messages()
+        self.answer_to_send["answer"] = self.user.read_unread_messages()
 
     def current_login(self):
         if self.user.nick is None:
