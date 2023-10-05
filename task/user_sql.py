@@ -78,7 +78,9 @@ class User:
             print("- Empty")
         only_text = list(map(lambda x: x[3], sorted_messages))
         # pprint(only_text)
-        return sorted_messages
+        sorted_messagesv2 = sorted(sorted_messages, key=lambda x: x[4])
+        pprint(sorted_messagesv2)
+        return sorted_messagesv2
 
     def sort_messages_by_date(self, from_nick="Olaf"):
         with GetConnection() as connection:
@@ -109,7 +111,7 @@ class User:
         with GetConnection() as connection:
             try:
                 counter_unread_messages = database.get_counter_unread_messages_with_sb(connection, self.nick, nick)
-                print(counter_unread_messages)
+                print(counter_unread_messages[2])
             except IndexError:
                 counter_unread_messages = 0
             if counter_unread_messages >= self.BUFOR_MESSAGES:
@@ -128,13 +130,14 @@ class User:
             if not self.check_do_u_have_this_nick_in_conversation(send_to_nick):
                 print("You dont have this nick in conversation, Now it's going to be added")
                 print(database.add_conversation(connection, self.nick, send_to_nick))
-            id_conversation = database.get_id_conversation(connection,self.nick, send_to_nick)
+            id_conversation = database.get_id_conversation(connection, self.nick, send_to_nick)
             print("id_message", database.add_message(connection, text[:], id_conversation))
             return f"Send ok"
 
     def check_do_u_have_this_nick_in_conversation(self, nick="Olaf"):
         with GetConnection() as connection:
-            list_users = database.get_nicks_conversation(connection, self.nick)  # dodaj self.nick ale dopiero po zalogowaniu!!!
+            list_users = database.get_nicks_conversation(connection,
+                                                         self.nick)  # dodaj self.nick ale dopiero po zalogowaniu!!!
             for user in list_users:
                 if nick == user[0]:
                     return True

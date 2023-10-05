@@ -185,5 +185,5 @@ def get_id_conversation(connection, nick1="Seba", nick2="Olaf"):
 
 def add_message(connection, text, id_conversation):
     with connection.get_cursor() as cursor:
-        cursor.execute(INSERT_MESSAGE, (text[0], text[1], text[2], "False", id_conversation))
+        cursor.execute(INSERT_MESSAGE, (text[0], text[2], text[1], "False", id_conversation))
         return cursor.fetchall()[0][0]

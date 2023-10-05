@@ -141,7 +141,7 @@ list of users - only login user can see list of users
         # check user is login:
         if self.current_login():
             return
-        text = [str(datetime.datetime.now()), "".join(map(lambda x: x + " ", message))]
+        text = [str(datetime.datetime.now()), message]
         self.answer_to_send["answer"] = self.user.send_text_to(nick, text)
 
     def show_conversation(self, nick):
