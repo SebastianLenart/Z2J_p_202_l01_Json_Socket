@@ -109,9 +109,10 @@ class User:
         with GetConnection() as connection:
             try:
                 counter_unread_messages = database.get_counter_unread_messages_with_sb(connection, self.nick, nick)
+                print(counter_unread_messages)
             except IndexError:
                 counter_unread_messages = 0
-            if counter_unread_messages[2] >= self.BUFOR_MESSAGES:
+            if counter_unread_messages >= self.BUFOR_MESSAGES:
                 return True
             return False
 

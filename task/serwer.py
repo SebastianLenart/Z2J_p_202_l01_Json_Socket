@@ -68,6 +68,8 @@ list of users - only login user can see list of users
             "show_conversation": lambda nick: self.show_conversation(nick),
             "show_unread_texts": self.show_unread_texts
         }
+        print("DATA: ", *data[1:])
+        dict_options[data[0]](*data[1:])
         try:
             dict_options[data[0]](*data[1:])
         except KeyError:
@@ -75,6 +77,7 @@ list of users - only login user can see list of users
         except TypeError:
             self.default_answer()
             self.answer_to_send["answer"] = "Za malo przekazanych argumetow"
+            print(data)
         self.answer_to_send["command"] = data[0]
         self.answer_to_send = json.dumps(self.answer_to_send).encode(encoding='utf8')
         conn.sendall(self.answer_to_send)
