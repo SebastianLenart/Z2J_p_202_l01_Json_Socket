@@ -101,12 +101,16 @@ class User:
 
     def read_unread_messages(self):
         with GetConnection() as connection:
-            unread_messages = database.get_unread_messages(connection, self.nick)
+            unread_messages = database.get_unread_messages(connection)
+            unread_messages3 = []
             for text in unread_messages:
                 print(f"{text[0]} have unread message(s) from {text[3]}: {text[4]}")
                 database.update_unread_message(connection, text[2])
-            unread_messages2 = list(map(lambda x: x[1], unread_messages))
-        return unread_messages
+                unread_messages3.append(tuple([text[0], "from", text[3], text[4]]))
+            unread_messages2 = list(map(lambda x: x[0], unread_messages))
+            if len(unread_messages) == 0:
+                return ["You dont have unread texts"]
+        return unread_messages3
 
     def check_bufor_in_receiver(self, nick="Olaf"):
         with GetConnection() as connection:
@@ -147,7 +151,7 @@ class User:
 
 if __name__ == '__main__':
     user = User()
-    pprint(user.send_text_to())
+    pprint(user.read_unread_messages())
 
 """
 if __name__ == '__main__':  # !!! bez tego ponizsze linijki beda wywolywane gdy gdzies uzyjemy 'from user import User'
